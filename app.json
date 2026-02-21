@@ -1,0 +1,38 @@
+{
+  "expo": {
+    "name": "786Times",
+    "slug": "786Times",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": false,
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icon.png",
+        "backgroundColor": "#1E1B4B"
+      },
+      "edgeToEdgeEnabled": true,
+      "package": "com.abdullah_rana.times786"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-font"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "45efd18d-d0de-4372-b986-07e02a347631"
+      }
+    }
+  }
+}
