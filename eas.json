@@ -10,7 +10,8 @@
         },
         "preview": {
             "android": {
-                "buildType": "apk"
+                "buildType": "apk",
+                "image": "ubuntu-22.04-jdk21-ndk26"
             }
         },
         "production": {}
