@@ -9,10 +9,7 @@
             "distribution": "internal"
         },
         "preview": {
-            "android": {
-                "buildType": "apk",
-                "image": "ubuntu-22.04-jdk21-ndk26"
-            }
+            "buildType": "apk"
         },
         "production": {}
     },
