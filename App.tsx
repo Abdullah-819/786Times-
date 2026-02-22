@@ -3,6 +3,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import DashboardScreen from './src/screens/DashboardScreen'
 import SectionSelectionScreen from './src/screens/SectionSelectionScreen'
+import SlotViewingScreen from './src/screens/SlotViewingScreen'
 import ScheduleScreen from './src/screens/ScheduleScreen'
 import AddEventScreen from './src/screens/AddEventScreen'
 import AnalyticsScreen from './src/screens/AnalyticsScreen'
@@ -60,7 +61,7 @@ function MainTabs() {
       <Tab.Screen
         name="Schedule"
         component={ScheduleScreen}
-        initialParams={{ section: 'SPE25-BSE-3-B' }} // Note: This will be dynamically updated by Dashboard navigation or storage
+        initialParams={{ section: 'SP25-BSE-3-B' }} // Note: This will be dynamically updated by Dashboard navigation or storage
       />
       <Tab.Screen name="Events" component={EventsListScreen} />
       <Tab.Screen name="Analytics" component={AnalyticsScreen} />
@@ -92,6 +93,7 @@ export default function App() {
           }}
         >
           <Stack.Screen name="SectionSelection" component={SectionSelectionScreen} />
+          <Stack.Screen name="SlotViewing" component={SlotViewingScreen} />
           <Stack.Screen name="Main" component={MainTabs} />
           <Stack.Screen name="AddEvent" component={AddEventScreen} />
         </Stack.Navigator>

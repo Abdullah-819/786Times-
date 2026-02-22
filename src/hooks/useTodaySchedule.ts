@@ -13,7 +13,7 @@ export const useTodaySchedule = () => {
     getSelectedSection().then(setSection)
   }, [])
 
-  const todayLectures: Lecture[] = timetable[section]?.[todayKey] || []
+  const todayLectures: Lecture[] = (timetable[section] as any)?.[todayKey] || []
 
   const metrics = useMemo(() => {
     const lecturesCount = todayLectures.filter(l => l.type === 'lecture').length

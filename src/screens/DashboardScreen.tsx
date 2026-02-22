@@ -100,6 +100,26 @@ export default function DashboardScreen({ navigation }: any) {
           <Text style={styles.dhikrContent}>Subhanallah ({dhikrCount})</Text>
         </BlurView>
 
+        {/* University Slot Explorer Entry */}
+        <TouchableOpacity activeOpacity={0.9} onPress={() => navigation.navigate('SlotViewing')}>
+          <BlurView intensity={25} tint="light" style={styles.explorerCard}>
+            <LinearGradient
+              colors={['rgba(234, 179, 8, 0.1)', 'transparent']}
+              style={StyleSheet.absoluteFill}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+            />
+            <View style={styles.explorerIconBox}>
+              <Ionicons name="map-outline" size={24} color="#EAB308" />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.explorerTitle}>University Slot Explorer</Text>
+              <Text style={styles.explorerSub}>Find free venues & booked slots</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={20} color="rgba(255,255,255,0.3)" />
+          </BlurView>
+        </TouchableOpacity>
+
         <MetricsCard
           lectures={metrics.lecturesCount}
           labs={metrics.labsCount}
@@ -273,5 +293,35 @@ const styles = StyleSheet.create({
     borderRadius: 28,
     justifyContent: 'center',
     alignItems: 'center',
-  }
+  },
+  explorerCard: {
+    marginBottom: 24,
+    padding: 20,
+    borderRadius: 24,
+    overflow: 'hidden',
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(234, 179, 8, 0.2)',
+  },
+  explorerIconBox: {
+    width: 48,
+    height: 48,
+    borderRadius: 14,
+    backgroundColor: 'rgba(234, 179, 8, 0.1)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 16,
+  },
+  explorerTitle: {
+    fontSize: 18,
+    fontWeight: '800',
+    color: '#fff',
+    letterSpacing: -0.5,
+  },
+  explorerSub: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: 'rgba(255,255,255,0.5)',
+  },
 })

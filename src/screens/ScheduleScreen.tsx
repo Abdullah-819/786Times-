@@ -9,16 +9,19 @@ import { useEffect, useState } from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
 export default function ScheduleScreen({ route, navigation }: any) {
-    const [section, setSection] = useState(route.params?.section || 'SPE25-BSE-3-B')
+    const [section, setSection] = useState(route.params?.section || 'SP25-BSE-3-B')
+    const [slotMode, setSlotMode] = useState<'free' | 'booked'>('free')
     const days: Weekday[] = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday']
     const [activeDay, setActiveDay] = useState<Weekday>(days[0])
 
     useEffect(() => {
-        const loadSection = async () => {
+        const loadSettings = async () => {
             const stored = await AsyncStorage.getItem('@selected_section')
             if (stored) setSection(stored)
+            const slot = await AsyncStorage.getItem('@slot_mode')
+            if (slot === 'booked') setSlotMode('booked')
         }
-        loadSection()
+        loadSettings()
     }, [])
 
     const renderLectureCard = (lecture: any, index: number) => {
@@ -34,7 +37,7 @@ export default function ScheduleScreen({ route, navigation }: any) {
             <View style={styles.header}>
                 <View>
                     <Text style={styles.title}>Weekly Sprint</Text>
-                    <Text style={styles.subtitle}>{section}</Text>
+                    <Text style={styles.subtitle}>{section} ({slotMode === 'free' ? 'free slots' : 'booked slots'})</Text>
                 </View>
             </View>
 

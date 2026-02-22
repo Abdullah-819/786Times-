@@ -6,7 +6,7 @@ export interface Lecture {
   type: LectureType
   start: string
   end: string
-  venue?: string
-  teacher?: string
-  slot?: string
+  slot: string
+  venue: string
+  teacher: string
 }
