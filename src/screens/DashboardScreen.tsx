@@ -9,9 +9,10 @@ import StatusBadge from '../components/StatusBadge'
 import { useTodaySchedule } from '../hooks/useTodaySchedule'
 import { theme } from '../theme'
 import { Ionicons } from '@expo/vector-icons'
+import * as Haptics from 'expo-haptics'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { BlurView } from 'expo-blur'
-import { getRandomQuote, getRandomDhikr } from '../data/quotes'
+import { getRandomQuote, getDailyDhikr } from '../data/quotes'
 import { Section, SECTIONS } from '../data/timetable'
 import { Quote } from '../data/quotes'
 
@@ -20,7 +21,7 @@ export default function DashboardScreen({ navigation }: any) {
   const { todayLectures, metrics } = useTodaySchedule()
   const quote = useMemo(() => getRandomQuote(), [])
   const [dhikrCount, setDhikrCount] = useState(0)
-  const dhikr = useMemo(() => getRandomDhikr(), [])
+  const dhikr = useMemo(() => getDailyDhikr(), [])
 
   const dayName = new Date().toLocaleDateString('en-US', { weekday: 'long' })
 
@@ -91,14 +92,22 @@ export default function DashboardScreen({ navigation }: any) {
           {quote.reference && <Text style={styles.referenceText}>{quote.reference}</Text>}
         </BlurView>
 
-        {/* Daily Dhikr Reminder */}
-        <BlurView intensity={15} tint="dark" style={styles.dhikrBox}>
-          <View style={styles.dhikrHeader}>
-            <Ionicons name="infinite-outline" size={16} color={theme.colors.secondary} />
-            <Text style={styles.dhikrTitle}>DAILY DHIKR</Text>
-          </View>
-          <Text style={styles.dhikrContent}>Subhanallah ({dhikrCount})</Text>
-        </BlurView>
+        {/* Daily Dhikr Reminder (Responsive Counter) */}
+        <TouchableOpacity
+          activeOpacity={0.7}
+          onPress={() => {
+            setDhikrCount(prev => prev + 1);
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          }}
+        >
+          <BlurView intensity={15} tint="dark" style={styles.dhikrBox}>
+            <View style={styles.dhikrHeader}>
+              <Ionicons name="infinite-outline" size={16} color={theme.colors.secondary} />
+              <Text style={styles.dhikrTitle}>DAILY DHIKR (TAP TO COUNT)</Text>
+            </View>
+            <Text style={styles.dhikrContent}>{dhikr} ({dhikrCount})</Text>
+          </BlurView>
+        </TouchableOpacity>
 
         {/* University Slot Explorer Entry */}
         <TouchableOpacity activeOpacity={0.9} onPress={() => navigation.navigate('SlotViewing')}>
@@ -115,6 +124,26 @@ export default function DashboardScreen({ navigation }: any) {
             <View style={{ flex: 1 }}>
               <Text style={styles.explorerTitle}>University Slot Explorer</Text>
               <Text style={styles.explorerSub}>Find free venues & booked slots</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={20} color="rgba(255,255,255,0.3)" />
+          </BlurView>
+        </TouchableOpacity>
+
+        {/* University Portal Viewer Entry */}
+        <TouchableOpacity activeOpacity={0.9} onPress={() => navigation.navigate('Portal')}>
+          <BlurView intensity={25} tint="dark" style={[styles.explorerCard, { borderColor: 'rgba(234, 179, 8, 0.4)' }]}>
+            <LinearGradient
+              colors={['rgba(234, 179, 8, 0.15)', 'transparent']}
+              style={StyleSheet.absoluteFill}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+            />
+            <View style={[styles.explorerIconBox, { backgroundColor: 'rgba(234, 179, 8, 0.2)' }]}>
+              <Ionicons name="globe-outline" size={24} color="#EAB308" />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.explorerTitle}>University Portal</Text>
+              <Text style={styles.explorerSub}>In-app secure academic portal</Text>
             </View>
             <Ionicons name="chevron-forward" size={20} color="rgba(255,255,255,0.3)" />
           </BlurView>

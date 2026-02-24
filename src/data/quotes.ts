@@ -51,16 +51,23 @@ export const INTRO_AYATS: Quote[] = [
 ]
 
 export const DHIKR_ROUTINES = [
-    "Don't forget to recite Durud Shareef",
-    "Don't forget to make Dua before class",
-    "SubhanAllah, Alhamdulillah, Allahu Akbar",
-    "Seek Allah's help with Istikhara",
-    "Keep your tongue moist with the remembrance of Allah"
+    "SubhanAllah (Glory be to Allah)",
+    "Alhamdulillah (Praise be to Allah)",
+    "Allahu Akbar (Allah is the Greatest)",
+    "La ilaha illallah (There is no god but Allah)",
+    "Astaghfirullah (I seek forgiveness from Allah)",
+    "SubhanAllahi wa bihamdihi (Glory and praise be to Allah)",
+    "La hawla wala quwwata illa billah (There is no power nor might except with Allah)"
 ]
 
 export const getRandomQuote = (): Quote => {
     const index = Math.floor(Math.random() * ISLAMIC_QUOTES.length)
     return ISLAMIC_QUOTES[index]
+}
+
+export const getDailyDhikr = (): string => {
+    const dayIndex = new Date().getDay() // 0 (Sunday) to 6 (Saturday)
+    return DHIKR_ROUTINES[dayIndex % DHIKR_ROUTINES.length]
 }
 
 export const getRandomDhikr = (): string => {

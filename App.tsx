@@ -9,6 +9,7 @@ import AddEventScreen from './src/screens/AddEventScreen'
 import AnalyticsScreen from './src/screens/AnalyticsScreen'
 import EventsListScreen from './src/screens/EventsListScreen'
 import AboutScreen from './src/screens/AboutScreen'
+import PortalScreen from './src/screens/PortalScreen'
 import { useEffect, useState } from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { Ionicons } from '@expo/vector-icons'
@@ -96,6 +97,8 @@ export default function App() {
           <Stack.Screen name="SlotViewing" component={SlotViewingScreen} />
           <Stack.Screen name="Main" component={MainTabs} />
           <Stack.Screen name="AddEvent" component={AddEventScreen} />
+          <Stack.Screen name="Portal" component={PortalScreen} />
+          <Stack.Screen name="About" component={AboutScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>

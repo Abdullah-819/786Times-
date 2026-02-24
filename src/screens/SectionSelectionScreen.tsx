@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, Dimensions, ScrollView, Platform, StatusBar } from 'react-native'
 import { LinearGradient } from 'expo-linear-gradient'
 import { theme } from '../theme'
 import { saveSection } from '../storage/sectionStore'
@@ -12,14 +12,11 @@ import Animated, {
     useAnimatedStyle,
     useSharedValue,
     withSpring,
-    withDelay,
-    interpolate,
-    interpolateColor
 } from 'react-native-reanimated'
-import { BlurView } from 'expo-blur'
 import { Ionicons } from '@expo/vector-icons'
 import { INTRO_AYATS, Quote } from '../data/quotes'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import * as WebBrowser from 'expo-web-browser'
 
 const { width, height } = Dimensions.get('window')
 
@@ -92,127 +89,115 @@ export default function SectionSelectionScreen({ navigation }: any) {
 
     return (
         <View style={styles.container}>
+            <StatusBar barStyle="light-content" />
             <LinearGradient colors={theme.colors.gradients.professional} style={StyleSheet.absoluteFill} />
-
-            <Animated.View
-                entering={FadeInDown.duration(1000).springify()}
-                style={styles.content}
+            <ScrollView
+                contentContainerStyle={styles.scrollContent}
+                showsVerticalScrollIndicator={false}
             >
-                <View style={styles.header}>
-                    <Text style={styles.welcomeText}>Choose Your Path</Text>
-                    <Text style={styles.tagline}>Select your academic section to continue</Text>
-                </View>
+                <Animated.View
+                    entering={FadeInDown.duration(800)}
+                    style={styles.header}
+                >
+                    <Text style={styles.headerTitle}>Academic Hub</Text>
+                    <Text style={styles.headerSub}>Select your destination to proceed</Text>
+                </Animated.View>
 
-                <View style={styles.grid}>
-                    <SectionCard
-                        title="Software Engineering"
-                        sub="SP25-BSE-3-B"
-                        icon="code-working"
-                        color="#6366F1"
+                <View style={styles.cardContainer}>
+                    <DashboardCard
+                        title="Software Engineering (3B)"
+                        sub="SP25-BSE-3-B • Timetable"
+                        icon="code-slash-outline"
+                        color="#3B82F6"
                         onPress={() => handleSelect(SECTIONS.BSE)}
                         index={0}
-                        fullWidth
                     />
-                    <SectionCard
-                        title="Computer Science (E)"
-                        sub="FA24-BCS-4-E"
-                        icon="terminal"
-                        color="#EC4899"
+                    <DashboardCard
+                        title="Computer Science (4E)"
+                        sub="FA24-BCS-4-E • Timetable"
+                        icon="terminal-outline"
+                        color="#EF4444"
                         onPress={() => handleSelect(SECTIONS.BCS)}
                         index={1}
-                        fullWidth
                     />
-                    <SectionCard
-                        title="Computer Science (F)"
-                        sub="FA24-BCS-4-F"
-                        icon="laptop"
+                    <DashboardCard
+                        title="Computer Science (4F)"
+                        sub="FA24-BCS-4-F • Timetable"
+                        icon="laptop-outline"
                         color="#22C55E"
                         onPress={() => handleSelect(SECTIONS.BCS_ALT)}
                         index={2}
-                        fullWidth
+                    />
+                    <DashboardCard
+                        title="Computer Science (6E)"
+                        sub="FA23-BCS-6-E • Timetable"
+                        icon="rocket-outline"
+                        color="#EC4899"
+                        onPress={() => handleSelect(SECTIONS.BCS_6E)}
+                        index={3}
+                    />
+                    <DashboardCard
+                        title="Student Portal"
+                        sub="CUI SAHIWAL"
+                        icon="globe-outline"
+                        color="#F59E0B"
+                        onPress={() => WebBrowser.openBrowserAsync('https://swl-sis.comsats.edu.pk/Login')}
+                        index={4}
+                    />
+                    <DashboardCard
+                        title="Slot Explorer"
+                        sub="Find free & booked venues"
+                        icon="grid-outline"
+                        color="#8B5CF6"
+                        onPress={() => navigation.navigate('SlotViewing')}
+                        index={5}
+                    />
+                    <DashboardCard
+                        title="About 786 Times"
+                        sub="The Team & The Mission"
+                        icon="people-outline"
+                        color="#64748B"
+                        onPress={() => navigation.navigate('About')}
+                        index={6}
                     />
                 </View>
 
-                {/* Navigation to Slot Explorer */}
-                <Animated.View
-                    entering={FadeInUp.delay(1000).springify()}
-                    style={styles.viewSlotsWrapper}
-                >
-                    <TouchableOpacity
-                        activeOpacity={0.8}
-                        onPress={() => navigation.navigate('SlotViewing')}
-                        style={styles.exploreBtn}
-                    >
-                        <BlurView intensity={20} tint="light" style={styles.exploreBtnContent}>
-                            <View style={styles.exploreIconBox}>
-                                <Ionicons name="grid-outline" size={24} color="#EAB308" />
-                            </View>
-                            <View>
-                                <Text style={styles.exploreTitle}>University Slot Explorer</Text>
-                                <Text style={styles.exploreSub}>View free & booked venues</Text>
-                            </View>
-                            <Ionicons name="chevron-forward" size={20} color="rgba(255,255,255,0.4)" style={{ marginLeft: 'auto' }} />
-                        </BlurView>
-                    </TouchableOpacity>
-                </Animated.View>
-            </Animated.View>
-
-            <Animated.View
-                entering={FadeInUp.delay(1200)}
-                style={styles.footer}
-            >
                 <Text style={styles.footerText}>786Times • Built by Abdullah Imran</Text>
-            </Animated.View>
+            </ScrollView>
         </View>
     )
 }
 
-function SectionCard({ title, sub, icon, color, onPress, index, fullWidth }: any) {
+function DashboardCard({ title, sub, icon, color, onPress, index }: any) {
     const scale = useSharedValue(1)
 
     const animatedStyle = useAnimatedStyle(() => ({
         transform: [{ scale: scale.value }]
     }))
 
-    const handlePressIn = () => { scale.value = withSpring(0.96) }
+    const handlePressIn = () => { scale.value = withSpring(0.95) }
     const handlePressOut = () => { scale.value = withSpring(1) }
 
     return (
         <Animated.View
-            entering={FadeInDown.delay(index * 150 + 400).springify().damping(12)}
-            style={[
-                styles.cardWrapper,
-                animatedStyle,
-                fullWidth ? styles.fullWidth : styles.halfWidth
-            ]}
+            entering={FadeInDown.delay(index * 100 + 400).springify()}
+            style={[styles.cardWrapper, animatedStyle]}
         >
             <TouchableOpacity
                 activeOpacity={1}
                 onPressIn={handlePressIn}
                 onPressOut={handlePressOut}
                 onPress={onPress}
+                style={[styles.card, { backgroundColor: color }]}
             >
-                <BlurView intensity={30} tint="light" style={styles.card}>
-                    <LinearGradient
-                        colors={[`${color}40`, 'transparent']}
-                        style={StyleSheet.absoluteFill}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 1 }}
-                    />
+                <View style={styles.cardContent}>
+                    <Text style={styles.cardTitle}>{title}</Text>
+                    <Text style={styles.cardSub}>{sub}</Text>
+                </View>
 
-                    <View style={[styles.iconBox, { backgroundColor: `${color}20` }]}>
-                        <Ionicons name={icon} size={30} color={color} />
-                    </View>
-
-                    <View style={styles.cardHeader}>
-                        <Text style={styles.cardTitle}>{title}</Text>
-                        <Text style={styles.cardSub}>{sub}</Text>
-                    </View>
-
-                    <View style={styles.arrowBox}>
-                        <Ionicons name="arrow-forward" size={20} color={color} />
-                    </View>
-                </BlurView>
+                <View style={styles.cardIconWrapper}>
+                    <Ionicons name={icon} size={84} color="rgba(255,255,255,0.2)" />
+                </View>
             </TouchableOpacity>
         </Animated.View>
     )
@@ -221,6 +206,69 @@ function SectionCard({ title, sub, icon, color, onPress, index, fullWidth }: any
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+    },
+    scrollContent: {
+        paddingHorizontal: 20,
+        paddingTop: Platform.OS === 'ios' ? 80 : 60,
+        paddingBottom: 40,
+    },
+    header: {
+        marginBottom: 32,
+    },
+    headerTitle: {
+        fontSize: 32,
+        fontWeight: '900',
+        color: '#FFFFFF',
+        letterSpacing: -0.5,
+    },
+    headerSub: {
+        fontSize: 16,
+        color: 'rgba(255, 255, 255, 0.6)',
+        fontWeight: '600',
+        marginTop: 4,
+    },
+    cardContainer: {
+        gap: 16,
+    },
+    cardWrapper: {
+        width: '100%',
+        height: 120,
+        borderRadius: 24,
+        elevation: 8,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 6 },
+        shadowOpacity: 0.15,
+        shadowRadius: 12,
+    },
+    card: {
+        flex: 1,
+        borderRadius: 24,
+        padding: 24,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        overflow: 'hidden',
+    },
+    cardContent: {
+        flex: 1,
+        zIndex: 1,
+    },
+    cardTitle: {
+        fontSize: 22,
+        fontWeight: '800',
+        color: '#FFFFFF',
+        letterSpacing: -0.2,
+    },
+    cardSub: {
+        fontSize: 13,
+        fontWeight: '600',
+        color: 'rgba(255,255,255,0.85)',
+        marginTop: 4,
+    },
+    cardIconWrapper: {
+        position: 'absolute',
+        right: -10,
+        bottom: -20,
     },
     introContainer: {
         flex: 1,
@@ -276,133 +324,13 @@ const styles = StyleSheet.create({
         height: '100%',
         backgroundColor: '#6366F1',
     },
-    content: {
-        flex: 1,
-        paddingHorizontal: 24,
-        paddingTop: height * 0.08,
-    },
-    header: {
-        marginBottom: 32,
-    },
-    welcomeText: {
-        fontSize: 44,
-        fontWeight: '900',
-        color: '#fff',
-        letterSpacing: -1.5,
-        lineHeight: 48,
-        marginBottom: 8,
-    },
-    tagline: {
-        fontSize: 18,
-        color: '#A5B4FC',
-        fontWeight: '600',
-        opacity: 0.9,
-    },
-    grid: {
-        gap: 16,
-    },
-    row: {
-        flexDirection: 'row',
-        gap: 16,
-    },
-    fullWidth: {
-        width: '100%',
-    },
-    halfWidth: {
-        flex: 1,
-    },
-    cardWrapper: {
-        borderRadius: 24,
-        overflow: 'hidden',
-        borderWidth: 1.5,
-        borderColor: 'rgba(255,255,255,0.15)',
-        elevation: 10,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 10 },
-        shadowOpacity: 0.3,
-        shadowRadius: 20,
-    },
-    card: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        padding: 24,
-        backgroundColor: 'rgba(255, 255, 255, 0.05)',
-    },
-    iconBox: {
-        width: 60,
-        height: 60,
-        borderRadius: 18,
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginRight: 20,
-    },
-    cardHeader: {
-        flex: 1,
-    },
-    cardTitle: {
-        fontSize: 20,
-        fontWeight: '800',
-        color: '#fff',
-        marginBottom: 4,
-    },
-    cardSub: {
-        fontSize: 14,
-        fontWeight: '700',
-        color: '#94A3B8',
-        textTransform: 'uppercase',
-        letterSpacing: 1,
-    },
-    arrowBox: {
-        width: 40,
-        height: 40,
-        borderRadius: 12,
-        backgroundColor: 'rgba(255,255,255,0.08)',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    viewSlotsWrapper: {
-        marginTop: 32,
-    },
-    exploreBtn: {
-        borderRadius: 24,
-        overflow: 'hidden',
-        borderWidth: 1.5,
-        borderColor: 'rgba(234, 179, 8, 0.3)', // Gold border
-    },
-    exploreBtnContent: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        padding: 20,
-        backgroundColor: 'rgba(234, 179, 8, 0.05)',
-    },
-    exploreIconBox: {
-        width: 48,
-        height: 48,
-        borderRadius: 14,
-        backgroundColor: 'rgba(234, 179, 8, 0.1)',
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginRight: 16,
-    },
-    exploreTitle: {
-        color: '#fff',
-        fontSize: 18,
-        fontWeight: '800',
-    },
-    exploreSub: {
-        color: 'rgba(255,255,255,0.5)',
-        fontSize: 12,
-        fontWeight: '600',
-    },
-    footer: {
-        paddingBottom: 40,
-        alignItems: 'center',
-    },
     footerText: {
         fontSize: 11,
-        color: 'rgba(255,255,255,0.3)',
+        color: '#94A3B8',
         fontWeight: '700',
         letterSpacing: 2,
         textTransform: 'uppercase',
+        textAlign: 'center',
+        marginTop: 40,
     },
-})
+});

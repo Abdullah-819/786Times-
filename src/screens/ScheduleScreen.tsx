@@ -1,12 +1,35 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions } from 'react-native'
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions, Alert } from 'react-native'
 import { LinearGradient } from 'expo-linear-gradient'
 import { theme } from '../theme'
 import { Ionicons } from '@expo/vector-icons'
 import { timetable, Weekday } from '../data/timetable'
 import { BlurView } from 'expo-blur'
-import Animated, { FadeInDown, FadeInRight, Layout, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated'
 import { useEffect, useState } from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import * as Notifications from 'expo-notifications'
+import * as Haptics from 'expo-haptics'
+import { getLectureStatus, getNotificationSeconds } from '../utils/TimeUtils'
+import Animated, {
+    FadeInDown,
+    FadeInRight,
+    Layout,
+    useAnimatedStyle,
+    useSharedValue,
+    withSpring,
+    withRepeat,
+    withTiming,
+    withSequence
+} from 'react-native-reanimated'
+
+Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+        shouldShowAlert: true,
+        shouldPlaySound: true,
+        shouldSetBadge: false,
+        shouldShowBanner: true,
+        shouldShowList: true,
+    }),
+});
 
 export default function ScheduleScreen({ route, navigation }: any) {
     const [section, setSection] = useState(route.params?.section || 'SP25-BSE-3-B')
@@ -79,32 +102,135 @@ export default function ScheduleScreen({ route, navigation }: any) {
 
 function LectureCard({ lecture, index }: any) {
     const scale = useSharedValue(1)
+    const opacity = useSharedValue(1)
+    const [status, setStatus] = useState(getLectureStatus(lecture.start, lecture.end))
+    const [isReminderSet, setIsReminderSet] = useState(false)
+
+    const progressWidth = useSharedValue(status.progress * 100)
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            const newStatus = getLectureStatus(lecture.start, lecture.end)
+            setStatus(newStatus)
+            progressWidth.value = withSpring(newStatus.progress * 100)
+        }, 60000)
+        return () => clearInterval(interval)
+    }, [lecture])
+
+    // Blinking effect for upcoming classes
+    useEffect(() => {
+        if (status.isUpcoming) {
+            opacity.value = withRepeat(
+                withSequence(
+                    withTiming(0.4, { duration: 800 }),
+                    withTiming(1, { duration: 800 })
+                ),
+                -1,
+                true
+            )
+        } else {
+            opacity.value = 1
+        }
+    }, [status.isUpcoming])
 
     const animatedStyle = useAnimatedStyle(() => ({
         transform: [{ scale: scale.value }]
     }))
 
+    const progressStyle = useAnimatedStyle(() => ({
+        width: `${progressWidth.value}%`
+    }))
+
+    const blinkStyle = useAnimatedStyle(() => ({
+        opacity: opacity.value
+    }))
+
     const handlePressIn = () => { scale.value = withSpring(0.97) }
     const handlePressOut = () => { scale.value = withSpring(1) }
+
+    const toggleReminder = async () => {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success)
+
+        if (isReminderSet) {
+            setIsReminderSet(false)
+            return
+        }
+
+        const { status: existingStatus } = await Notifications.getPermissionsAsync();
+        let finalStatus = existingStatus;
+        if (existingStatus !== 'granted') {
+            const { status } = await Notifications.requestPermissionsAsync();
+            finalStatus = status;
+        }
+
+        if (finalStatus !== 'granted') return;
+
+        setIsReminderSet(true)
+
+        const secondsToAlert = getNotificationSeconds(lecture.start)
+
+        await Notifications.scheduleNotificationAsync({
+            content: {
+                title: `10m Warning: ${lecture.title}`,
+                body: `Starts soon at ${lecture.venue} with ${lecture.teacher}`,
+                sound: true,
+            },
+            trigger: {
+                type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+                seconds: Math.max(secondsToAlert, 1)
+            },
+        });
+
+        if (secondsToAlert > 10) {
+            Alert.alert("Reminder Set", `I'll alert you 10 minutes before ${lecture.title} starts!`)
+        } else {
+            Alert.alert("Reminder Set", `Class is starting soon! I'll alert you in 5 seconds.`)
+        }
+    }
 
     return (
         <Animated.View
             entering={FadeInDown.delay(index * 100).springify()}
             layout={Layout.springify()}
-            style={styles.cardWrapper}
+            style={[
+                styles.cardWrapper,
+                status.isActive && styles.activeCardGlow,
+                status.isCompleted && styles.completedCard
+            ]}
         >
-            <TouchableOpacity activeOpacity={0.9}>
+            <TouchableOpacity
+                activeOpacity={0.9}
+                onPressIn={handlePressIn}
+                onPressOut={handlePressOut}
+            >
                 <BlurView intensity={25} tint="dark" style={styles.lectureCard}>
                     {/* Left Accent Bar */}
                     <View style={[
                         styles.accentBar,
-                        { backgroundColor: lecture.type === 'lecture' ? '#6366F1' : '#FBBF24' }
+                        { backgroundColor: status.isCompleted ? '#10B981' : (lecture.type === 'lecture' ? '#6366F1' : '#FBBF24') }
                     ]} />
 
                     <View style={styles.cardContent}>
                         <View style={styles.cardHeader}>
-                            <View style={[styles.typeBadge, { backgroundColor: lecture.type === 'lecture' ? 'rgba(99, 102, 241, 0.15)' : 'rgba(251, 191, 36, 0.15)' }]}>
-                                <Text style={[styles.typeText, { color: lecture.type === 'lecture' ? '#818CF8' : '#FBBF24' }]}>{lecture.type}</Text>
+                            <View style={styles.headerLeftGroup}>
+                                <View style={[styles.typeBadge, { backgroundColor: lecture.type === 'lecture' ? 'rgba(99, 102, 241, 0.15)' : 'rgba(251, 191, 36, 0.15)' }]}>
+                                    <Text style={[styles.typeText, { color: lecture.type === 'lecture' ? '#818CF8' : '#FBBF24' }]}>{lecture.type}</Text>
+                                </View>
+                                {status.isUpcoming ? (
+                                    <Animated.View style={[styles.statusBadge, styles.statusBadgeUpcoming, blinkStyle]}>
+                                        <View style={[styles.statusDot, { backgroundColor: '#EAB308' }]} />
+                                        <Text style={[styles.statusLabel, { color: '#EAB308' }]}>{status.label}</Text>
+                                    </Animated.View>
+                                ) : (
+                                    <View style={[
+                                        styles.statusBadge,
+                                        status.isActive && styles.statusBadgeActive,
+                                        status.isCompleted && styles.statusBadgeCompleted
+                                    ]}>
+                                        <View style={[styles.statusDot, { backgroundColor: status.isActive ? '#10B981' : (status.isCompleted ? '#10B981' : '#94A3B8') }]} />
+                                        <Text style={[styles.statusLabel, status.isCompleted && { color: '#10B981' }]}>{status.label}</Text>
+                                    </View>
+                                )}
                             </View>
                             <View style={styles.slotBadge}>
                                 <Ionicons name="flash-outline" size={12} color={theme.colors.secondary} />
@@ -127,6 +253,20 @@ function LectureCard({ lecture, index }: any) {
                             </View>
                         </View>
 
+                        {/* Animated Progress Bar (Only show if active) */}
+                        {status.isActive && (
+                            <View style={styles.progressContainer}>
+                                <View style={styles.progressBarBg}>
+                                    <Animated.View
+                                        style={[
+                                            styles.progressBarFill,
+                                            progressStyle
+                                        ]}
+                                    />
+                                </View>
+                            </View>
+                        )}
+
                         <View style={styles.divider} />
 
                         <View style={styles.cardFooter}>
@@ -139,9 +279,19 @@ function LectureCard({ lecture, index }: any) {
                                 </View>
                             </View>
 
-                            <TouchableOpacity style={styles.bellBtn}>
-                                <LinearGradient colors={['#6366F1', '#4F46E5']} style={styles.bellGradient}>
-                                    <Ionicons name="notifications" size={18} color="#fff" />
+                            <TouchableOpacity
+                                style={styles.bellBtn}
+                                onPress={toggleReminder}
+                            >
+                                <LinearGradient
+                                    colors={isReminderSet ? ['#10B981', '#059669'] : ['#6366F1', '#4F46E5']}
+                                    style={styles.bellGradient}
+                                >
+                                    <Ionicons
+                                        name={isReminderSet ? "notifications" : "notifications-outline"}
+                                        size={18}
+                                        color="#fff"
+                                    />
                                 </LinearGradient>
                             </TouchableOpacity>
                         </View>
@@ -235,13 +385,23 @@ const styles = StyleSheet.create({
         borderColor: 'rgba(255,255,255,0.08)',
         backgroundColor: '#0F172A',
     },
+    activeCardGlow: {
+        borderColor: 'rgba(99, 102, 241, 0.4)',
+        shadowColor: '#6366F1',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.2,
+        shadowRadius: 10,
+        elevation: 5,
+    },
+    completedCard: {
+        borderColor: 'rgba(16, 185, 129, 0.2)',
+        opacity: 0.7,
+    },
     lectureCard: {
         flexDirection: 'row',
-        padding: 0, // Controlled by content
     },
     accentBar: {
         width: 6,
-        height: '100%',
     },
     cardContent: {
         flex: 1,
@@ -253,16 +413,52 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 12,
     },
+    headerLeftGroup: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
+    },
     typeBadge: {
-        paddingHorizontal: 10,
-        paddingVertical: 5,
+        paddingHorizontal: 8,
+        paddingVertical: 4,
         borderRadius: 8,
+    },
+    statusBadge: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 6,
+        backgroundColor: 'rgba(255,255,255,0.05)',
+        paddingHorizontal: 8,
+        paddingVertical: 4,
+        borderRadius: 8,
+    },
+    statusBadgeActive: {
+        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+    },
+    statusBadgeUpcoming: {
+        backgroundColor: 'rgba(234, 179, 8, 0.1)',
+        borderWidth: 1,
+        borderColor: 'rgba(234, 179, 8, 0.3)',
+    },
+    statusBadgeCompleted: {
+        backgroundColor: 'rgba(16, 185, 129, 0.05)',
+    },
+    statusDot: {
+        width: 6,
+        height: 6,
+        borderRadius: 3,
+    },
+    statusLabel: {
+        fontSize: 9,
+        fontWeight: '800',
+        color: '#CBD5E1',
+        textTransform: 'uppercase',
     },
     typeText: {
         fontSize: 9,
         fontWeight: '900',
         textTransform: 'uppercase',
-        letterSpacing: 1.2,
+        letterSpacing: 1,
     },
     slotBadge: {
         flexDirection: 'row',
@@ -272,21 +468,20 @@ const styles = StyleSheet.create({
     slotText: {
         fontSize: 10,
         fontWeight: '800',
-        color: '#94A3B8',
-        letterSpacing: 0.5,
+        color: '#64748B',
     },
     lectureTitle: {
-        fontSize: 22,
+        fontSize: 20,
         fontWeight: '900',
         color: '#fff',
         letterSpacing: -0.5,
-        marginBottom: 16,
+        marginBottom: 12,
     },
     infoRow: {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 16,
-        marginBottom: 16,
+        marginBottom: 12,
     },
     instructorBox: {
         flexDirection: 'row',
@@ -295,9 +490,9 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     miniIcon: {
-        width: 24,
-        height: 24,
-        borderRadius: 12,
+        width: 20,
+        height: 20,
+        borderRadius: 10,
         backgroundColor: 'rgba(255,255,255,0.1)',
         justifyContent: 'center',
         alignItems: 'center',
@@ -310,7 +505,21 @@ const styles = StyleSheet.create({
     infoText: {
         fontSize: 12,
         fontWeight: '700',
-        color: '#CBD5E1',
+        color: '#94A3B8',
+    },
+    progressContainer: {
+        marginBottom: 16,
+    },
+    progressBarBg: {
+        height: 4,
+        backgroundColor: 'rgba(255,255,255,0.05)',
+        borderRadius: 2,
+        overflow: 'hidden',
+    },
+    progressBarFill: {
+        height: '100%',
+        backgroundColor: '#6366F1',
+        borderRadius: 2,
     },
     divider: {
         height: 1,
@@ -337,20 +546,20 @@ const styles = StyleSheet.create({
         gap: 8,
     },
     timeMain: {
-        fontSize: 15,
+        fontSize: 14,
         fontWeight: '900',
         color: '#fff',
     },
     timeConnector: {
-        width: 8,
+        width: 6,
         height: 2,
         backgroundColor: 'rgba(255,255,255,0.2)',
         borderRadius: 1,
     },
     bellBtn: {
-        width: 40,
-        height: 40,
-        borderRadius: 12,
+        width: 36,
+        height: 36,
+        borderRadius: 10,
         overflow: 'hidden',
     },
     bellGradient: {

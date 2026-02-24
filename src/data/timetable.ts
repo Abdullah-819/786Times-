@@ -11,6 +11,7 @@ export const SECTIONS = {
   BSE: 'SP25-BSE-3-B',
   BCS: 'FA24-BCS-4-E',
   BCS_ALT: 'FA24-BCS-4-F',
+  BCS_6E: 'FA23-BCS-6-E',
 } as const
 
 export type Section = typeof SECTIONS[keyof typeof SECTIONS]
@@ -24,7 +25,7 @@ export const timetable: Record<string, Record<Weekday, Lecture[]>> = {
     ],
     tuesday: [
       { id: 'bse-t1', title: 'Software Engineering', type: 'lecture', start: '08:00 AM', end: '09:00 AM', venue: 'D2', teacher: 'Ms. Abida Kausar', slot: '1st Slot' },
-      { id: 'bse-t2', title: 'Fundamentals of Digital Logic Design', type: 'lab', start: '09:00 AM', end: '10:00 AM', venue: 'DLD Lab', teacher: 'Mr. Kashif', slot: '2nd Slot' },
+      { id: 'bse-t2', title: 'Fundamentals of Digital Logic Design', type: 'lab', start: '09:00 AM', end: '11:00 AM', venue: 'DLD Lab', teacher: 'Mr. Kashif', slot: '2nd Slot' },
       { id: 'bse-t3', title: 'Data Structures', type: 'lecture', start: '11:00 AM', end: '12:00 PM', venue: 'C1.1', teacher: 'Dr. Muhammad Shoaib', slot: '4th Slot' },
     ],
     wednesday: [
@@ -36,14 +37,14 @@ export const timetable: Record<string, Record<Weekday, Lecture[]>> = {
     ],
     thursday: [
       { id: 'bse-th1', title: 'Calculus and Analytic Geometry', type: 'lecture', start: '08:00 AM', end: '09:00 AM', venue: 'C2.5', teacher: 'Dr. Amar Rauf', slot: '1st Slot' },
-      { id: 'bse-th2', title: 'Data Structures', type: 'lab', start: '09:00 AM', end: '10:00 AM', venue: 'CLab-3', teacher: 'Mr. Shehzad Ali', slot: '2nd Slot' },
+      { id: 'bse-th2', title: 'Data Structures', type: 'lab', start: '09:00 AM', end: '11:00 AM', venue: 'CLab-3', teacher: 'Mr. Shehzad Ali', slot: '2nd Slot' },
       { id: 'bse-th3', title: 'Fundamentals of Digital Logic Design', type: 'lecture', start: '11:00 AM', end: '12:00 PM', venue: 'D9', teacher: 'Mr. Khalid Majeed', slot: '4th Slot' },
     ],
     friday: [],
   },
   [SECTIONS.BCS]: {
     monday: [
-      { id: 'bcs-m1', title: 'Computer Networks', type: 'lab', start: '09:00 AM', end: '10:00 AM', venue: 'CLab-11', teacher: 'Mr. Muhammad Usman Nasir', slot: '2nd Slot' },
+      { id: 'bcs-m1', title: 'Computer Networks', type: 'lab', start: '09:00 AM', end: '11:00 AM', venue: 'CLab-11', teacher: 'Mr. Muhammad Usman Nasir', slot: '2nd Slot' },
       { id: 'bcs-m2', title: 'Information Security', type: 'lecture', start: '01:00 PM', end: '02:00 PM', venue: 'C1', teacher: 'Mr. Muhammad Umar', slot: '5th Slot' },
     ],
     tuesday: [],
@@ -54,7 +55,7 @@ export const timetable: Record<string, Record<Weekday, Lecture[]>> = {
       { id: 'bcs-w4', title: 'Information Security', type: 'lecture', start: '01:00 PM', end: '02:00 PM', venue: 'C1.1', teacher: 'Mr. Muhammad Umar', slot: '5th Slot' },
     ],
     thursday: [
-      { id: 'bcs-th1', title: 'Information Security', type: 'lab', start: '08:00 AM', end: '09:00 AM', venue: 'CLab-9', teacher: 'Ms. Nusra Rehman', slot: '1st Slot' },
+      { id: 'bcs-th1', title: 'Information Security', type: 'lab', start: '08:00 AM', end: '10:00 AM', venue: 'CLab-9', teacher: 'Ms. Nusra Rehman', slot: '1st Slot' },
       { id: 'bcs-th2', title: 'Multivariable Calculus', type: 'lecture', start: '10:00 AM', end: '11:00 AM', venue: 'B7', teacher: 'Dr. Asma', slot: '3rd Slot' },
       { id: 'bcs-th3', title: 'Artificial Intelligence', type: 'lab', start: '11:00 AM', end: '12:00 PM', venue: 'CLab-2', teacher: 'Ms. Rimsha Rafiq', slot: '4th Slot' },
       { id: 'bcs-th4', title: 'Artificial Intelligence', type: 'lab', start: '01:00 PM', end: '02:00 PM', venue: 'CLab-2', teacher: 'Ms. Rimsha Rafiq', slot: '5th Slot' },
@@ -71,7 +72,7 @@ export const timetable: Record<string, Record<Weekday, Lecture[]>> = {
       { id: 'bcs-alt-m3', title: 'Information Security', type: 'lab', start: '01:00 PM', end: '02:00 PM', venue: 'CLab-4', teacher: 'Ms. Nusra Rehman', slot: '5th Slot' },
     ],
     tuesday: [
-      { id: 'bcs-alt-t1', title: 'Computer Networks', type: 'lab', start: '08:00 AM', end: '09:00 AM', venue: 'Networking Lab', teacher: 'Ms. Sameen Fatima', slot: '1st Slot' },
+      { id: 'bcs-alt-t1', title: 'Computer Networks', type: 'lab', start: '08:00 AM', end: '10:00 AM', venue: 'Networking Lab', teacher: 'Ms. Sameen Fatima', slot: '1st Slot' },
       { id: 'bcs-alt-t2', title: 'Information Security', type: 'lecture', start: '10:00 AM', end: '11:00 AM', venue: 'C1', teacher: 'Mr. Muhammad Umar', slot: '3rd Slot' },
       { id: 'bcs-alt-t3', title: 'Artificial Intelligence', type: 'lecture', start: '11:00 AM', end: '12:00 PM', venue: 'D1', teacher: 'Mr. Manzar Abbas', slot: '4th Slot' },
     ],
@@ -81,10 +82,34 @@ export const timetable: Record<string, Record<Weekday, Lecture[]>> = {
       { id: 'bcs-alt-w3', title: 'Computer Networks', type: 'lecture', start: '10:00 AM', end: '11:00 AM', venue: 'B3', teacher: 'Ms. Sameen Fatima', slot: '3rd Slot' },
     ],
     thursday: [
-      { id: 'bcs-alt-th1', title: 'Artificial Intelligence', type: 'lab', start: '08:00 AM', end: '09:00 AM', venue: 'CLab-2', teacher: 'Mr. Manzar Abbas', slot: '1st Slot' },
+      { id: 'bcs-alt-th1', title: 'Artificial Intelligence', type: 'lab', start: '08:00 AM', end: '10:00 AM', venue: 'CLab-2', teacher: 'Mr. Manzar Abbas', slot: '1st Slot' },
       { id: 'bcs-alt-th2', title: 'Multivariable Calculus', type: 'lecture', start: '10:00 AM', end: '11:00 AM', venue: 'W4', teacher: 'Dr. Misbah Arshad', slot: '3rd Slot' },
       { id: 'bcs-alt-th3', title: 'Computer Networks', type: 'lecture', start: '01:00 PM', end: '02:00 PM', venue: 'W4', teacher: 'Ms. Sameen Fatima', slot: '5th Slot' },
     ],
     friday: [],
+  },
+  [SECTIONS.BCS_6E]: {
+    monday: [
+      { id: 'bcs6e-m1', title: 'Machine Learning Fundamentals', type: 'lab', start: '09:00 AM', end: '11:00 AM', venue: 'CLab-3', teacher: 'Ms. Raheela Shahzadi', slot: '2nd Slot' },
+      { id: 'bcs6e-m2', title: 'Advanced Web Technologies', type: 'lecture', start: '11:00 AM', end: '12:00 PM', venue: 'C1.1', teacher: 'Ms. Samra Firdous Sabir', slot: '4th Slot' },
+    ],
+    tuesday: [
+      { id: 'bcs6e-t1', title: 'Advanced Web Technologies', type: 'lecture', start: '08:00 AM', end: '09:00 AM', venue: 'C2.4', teacher: 'Ms. Samra Firdous Sabir', slot: '1st Slot' },
+      { id: 'bcs6e-t2', title: 'Machine Learning Fundamentals', type: 'lecture', start: '09:00 AM', end: '10:00 AM', venue: 'C5', teacher: 'Ms. Raheela Shahzadi', slot: '2nd Slot' },
+      { id: 'bcs6e-t3', title: 'Advance Database Systems', type: 'lecture', start: '10:00 AM', end: '11:00 AM', venue: 'B7', teacher: 'Mr. Syed Anwaar Mehdi', slot: '3rd Slot' },
+      { id: 'bcs6e-t4', title: 'Linear Algebra', type: 'lecture', start: '11:00 AM', end: '12:00 PM', venue: 'B13', teacher: 'Ms. Zoya', slot: '4th Slot' },
+      { id: 'bcs6e-t5', title: 'Theory of Automata', type: 'lecture', start: '01:00 PM', end: '02:00 PM', venue: 'B12', teacher: 'Mr. Husnain Raza', slot: '5th Slot' },
+    ],
+    wednesday: [],
+    thursday: [
+      { id: 'bcs6e-th1', title: 'Machine Learning Fundamentals', type: 'lecture', start: '08:00 AM', end: '09:00 AM', venue: 'B3', teacher: 'Ms. Raheela Shahzadi', slot: '1st Slot' },
+      { id: 'bcs6e-th2', title: 'Advance Database Systems', type: 'lab', start: '09:00 AM', end: '11:00 AM', venue: 'CLab-4', teacher: 'Mr. Syed Anwaar Mehdi', slot: '2nd Slot' },
+      { id: 'bcs6e-th3', title: 'Theory of Automata', type: 'lecture', start: '11:00 AM', end: '12:00 PM', venue: 'A3', teacher: 'Mr. Husnain Raza', slot: '4th Slot' },
+      { id: 'bcs6e-th4', title: 'Linear Algebra', type: 'lecture', start: '01:00 PM', end: '02:00 PM', venue: 'C2.5', teacher: 'Ms. Zoya', slot: '5th Slot' },
+    ],
+    friday: [
+      { id: 'bcs6e-f1', title: 'Advanced Web Technologies', type: 'lab', start: '08:00 AM', end: '10:00 AM', venue: 'CLab-11', teacher: 'Ms. Samra Firdous Sabir', slot: '1st Slot' },
+      { id: 'bcs6e-f2', title: 'Advance Database Systems', type: 'lecture', start: '11:00 AM', end: '12:00 PM', venue: 'C4', teacher: 'Mr. Syed Anwaar Mehdi', slot: '4th Slot' },
+    ],
   },
 }

@@ -7,6 +7,33 @@ import Animated, { FadeInDown } from 'react-native-reanimated'
 
 const { width } = Dimensions.get('window')
 
+const SQUAD_MEMBERS = [
+    {
+        name: "Muhammad Safiullah Khan",
+        role: "Data Engineer",
+        initials: "SK",
+        color: ['#F59E0B', '#D97706']
+    },
+    {
+        name: "Abdullah Rana",
+        role: "MERN STACK DEVELOPER",
+        initials: "AR",
+        color: ['#6366F1', '#4F46E5']
+    },
+    {
+        name: "AHMAD ALI",
+        role: "GRAPHICS AND APPEARANCE",
+        initials: "AA",
+        color: ['#EC4899', '#DB2777']
+    },
+    {
+        name: "MUHAMMAD AHMED",
+        role: "APP UI AND RESPONSIVENESS",
+        initials: "MA",
+        color: ['#10B981', '#059669']
+    }
+]
+
 export default function AboutScreen({ navigation }: any) {
     const openLink = (url: string) => {
         Linking.openURL(url).catch(err => console.error("Couldn't load page", err))
@@ -14,73 +41,58 @@ export default function AboutScreen({ navigation }: any) {
 
     return (
         <View style={styles.container}>
-            <LinearGradient colors={['#1E1B4B', '#111827']} style={StyleSheet.absoluteFill} />
+            <LinearGradient colors={['#0F172A', '#1E1B4B', '#0F172A']} style={StyleSheet.absoluteFill} />
 
             <View style={styles.header}>
-                <Text style={styles.title}>Developer</Text>
+                <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+                    <Ionicons name="chevron-back" size={24} color="#fff" />
+                </TouchableOpacity>
+                <Text style={styles.title}>The 786 Squad</Text>
             </View>
 
             <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
                 <Animated.View entering={FadeInDown.delay(100).springify()}>
-                    <BlurView intensity={20} tint="light" style={styles.card}>
-                        <LinearGradient
-                            colors={['rgba(255,255,255,0.1)', 'transparent']}
-                            style={StyleSheet.absoluteFill}
-                        />
-
-                        <View style={styles.avatarContainer}>
-                            <LinearGradient colors={['#6366F1', '#A855F7']} style={styles.avatarGradient}>
-                                <Text style={styles.avatarText}>AI</Text>
-                            </LinearGradient>
-                        </View>
-
-                        <Text style={styles.name}>Abdullah Imran</Text>
-                        <Text style={styles.tagline}>CS Student & Software Architect</Text>
-
-                        <View style={styles.divider} />
-
-                        <Text style={styles.sectionTitle}>ABOUT ME</Text>
-                        <Text style={styles.description}>
-                            I’m Abdullah Imran, a Computer Science student working on real,
-                            semester-grade software projects with a strong focus on correctness,
-                            architecture, and long-term maintainability.
-                        </Text>
-
-                        <View style={styles.divider} />
-
-                        <Text style={styles.sectionTitle}>ABOUT 786TIMES</Text>
+                    <BlurView intensity={20} tint="light" style={styles.aboutCard}>
+                        <Text style={styles.sectionTitle}>MISSION STATEMENT</Text>
                         <Text style={styles.description}>
                             786Times is a spiritually grounded academic assistant designed to
-                            streamline your university life. It combines high-performance
-                            scheduling with daily spiritual reminders to help you maintain balance.
+                            streamline university life. We combine high-performance
+                            scheduling with daily spiritual reminders to help students maintain balance.
                         </Text>
-                        <Text style={[styles.description, { marginTop: 12 }]}>
-                            Built with React Native and Reanimated, it features ultra-realistic
-                            timetable management, real-time metrics, and a dynamic Quranic intro
-                            system to keep you inspired every day.
-                        </Text>
-
-                        <View style={styles.divider} />
-
-                        <Text style={styles.sectionTitle}>CONNECT</Text>
-                        <View style={styles.linkGrid}>
-                            <TouchableOpacity onPress={() => openLink('https://www.linkedin.com/in/abdullah-imran-835483327/')} style={styles.linkBtn}>
-                                <Ionicons name="logo-linkedin" size={20} color="#0077B5" />
-                                <Text style={styles.linkText}>LinkedIn</Text>
-                            </TouchableOpacity>
-
-                            <TouchableOpacity onPress={() => openLink('https://github.com/Abdullah-819')} style={styles.linkBtn}>
-                                <Ionicons name="logo-github" size={20} color="#fff" />
-                                <Text style={styles.linkText}>GitHub</Text>
-                            </TouchableOpacity>
-
-                            <TouchableOpacity onPress={() => openLink('mailto:ranaabdullah228.ar1@gmail.com')} style={styles.linkBtn}>
-                                <Ionicons name="mail-outline" size={20} color="#EF4444" />
-                                <Text style={styles.linkText}>Email</Text>
-                            </TouchableOpacity>
-                        </View>
                     </BlurView>
                 </Animated.View>
+
+                <Text style={styles.teamTitle}>Core Team</Text>
+
+                {SQUAD_MEMBERS.map((member, index) => (
+                    <Animated.View
+                        key={member.name}
+                        entering={FadeInDown.delay(200 + index * 100).springify()}
+                    >
+                        <BlurView intensity={15} tint="dark" style={styles.memberCard}>
+                            <LinearGradient
+                                colors={member.color as any}
+                                style={styles.memberAvatar}
+                            >
+                                <Text style={styles.avatarText}>{member.initials}</Text>
+                            </LinearGradient>
+                            <View style={styles.memberInfo}>
+                                <Text style={styles.memberName}>{member.name}</Text>
+                                <Text style={styles.memberRole}>{member.role}</Text>
+                            </View>
+                        </BlurView>
+                    </Animated.View>
+                ))}
+
+                <View style={styles.divider} />
+
+                <Text style={styles.sectionTitle}>THE TECH STACK</Text>
+                <Text style={styles.description}>
+                    Built with React Native and Reanimated, featuring ultra-realistic
+                    timetable management, real-time metrics, and a dynamic Quranic intro
+                    system to keep you inspired every day.
+                </Text>
+
                 <View style={{ height: 40 }} />
             </ScrollView>
         </View>
@@ -118,91 +130,80 @@ const styles = StyleSheet.create({
     scrollContent: {
         padding: theme.spacing.lg,
     },
-    card: {
-        padding: 30,
-        borderRadius: 35,
+    aboutCard: {
+        padding: 24,
+        borderRadius: 24,
         overflow: 'hidden',
         backgroundColor: 'rgba(255,255,255,0.03)',
         borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.1)',
+        borderColor: 'rgba(255,255,255,0.08)',
+        marginBottom: 32,
+    },
+    teamTitle: {
+        fontSize: 20,
+        fontWeight: '900',
+        color: '#fff',
+        marginBottom: 16,
+        letterSpacing: -0.5,
+    },
+    memberCard: {
+        flexDirection: 'row',
         alignItems: 'center',
+        padding: 16,
+        borderRadius: 20,
+        overflow: 'hidden',
+        backgroundColor: 'rgba(255,255,255,0.03)',
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.05)',
+        marginBottom: 12,
     },
-    avatarContainer: {
-        marginBottom: 20,
-        elevation: 10,
-        shadowColor: '#6366F1',
-        shadowOffset: { width: 0, height: 10 },
-        shadowOpacity: 0.3,
-        shadowRadius: 15,
-    },
-    avatarGradient: {
-        width: 80,
-        height: 80,
-        borderRadius: 40,
+    memberAvatar: {
+        width: 50,
+        height: 50,
+        borderRadius: 15,
         justifyContent: 'center',
         alignItems: 'center',
     },
     avatarText: {
         color: '#fff',
-        fontSize: 32,
+        fontSize: 18,
         fontWeight: '900',
     },
-    name: {
-        fontSize: 26,
-        fontWeight: '900',
+    memberInfo: {
+        flex: 1,
+        marginLeft: 16,
+    },
+    memberName: {
+        fontSize: 17,
+        fontWeight: '800',
         color: '#fff',
-        letterSpacing: -0.5,
-        marginBottom: 4,
+        letterSpacing: -0.3,
     },
-    tagline: {
-        fontSize: 14,
+    memberRole: {
+        fontSize: 11,
         fontWeight: '700',
         color: '#818CF8',
-        marginBottom: 24,
         textTransform: 'uppercase',
         letterSpacing: 1,
-    },
-    divider: {
-        width: width * 0.5,
-        height: 1,
-        backgroundColor: 'rgba(255,255,255,0.1)',
-        marginVertical: 24,
+        marginTop: 2,
     },
     sectionTitle: {
-        fontSize: 12,
+        fontSize: 10,
         fontWeight: '900',
-        color: '#CBD5E1',
-        letterSpacing: 2,
-        marginBottom: 16,
-        alignSelf: 'flex-start',
+        color: '#818CF8',
+        letterSpacing: 1.5,
+        marginBottom: 12,
+        textTransform: 'uppercase',
     },
     description: {
-        fontSize: 15,
+        fontSize: 14,
         fontWeight: '600',
         color: '#94A3B8',
-        lineHeight: 22,
-        alignSelf: 'flex-start',
+        lineHeight: 20,
     },
-    linkGrid: {
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        gap: 12,
-        justifyContent: 'center',
-    },
-    linkBtn: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 8,
+    divider: {
+        height: 1,
         backgroundColor: 'rgba(255,255,255,0.05)',
-        paddingHorizontal: 16,
-        paddingVertical: 10,
-        borderRadius: 14,
-        borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.05)',
+        marginVertical: 32,
     },
-    linkText: {
-        color: '#fff',
-        fontSize: 13,
-        fontWeight: '700',
-    }
 })
